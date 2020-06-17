@@ -4,17 +4,48 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    private Animation thisAnimation;
+    private GameManager theGameManger;
 
-    void Start()
+    private Rigidbody thisRigidboy = null;
+
+    public float Force = 100;
+
+    Animator FLAPPING;
+
+    private void OnParticleTrigger()
     {
-        thisAnimation = GetComponent<Animation>();
-        thisAnimation["Flap_Legacy"].speed = 3;
+        ParticleSystem explo = GetComponent<ParticleSystem>();  
     }
 
+
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        thisRigidboy = GetComponent<Rigidbody>();
+        FLAPPING = gameObject.GetComponent<Animator>();
+        theGameManger = FindObjectOfType<GameManager>();
+
+    }
+
+    // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-            thisAnimation.Play();
+       if(Input.GetKeyDown(KeyCode.Space))
+        {
+            thisRigidboy.AddForce(Vector3.up * Force);
+            FLAPPING.SetTrigger("Flap");
+        }
+    }
+
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.tag == "Obstacle")
+        {
+            OnParticleTrigger();
+            theGameManger.GamePause();
+            
+        }
     }
 }
